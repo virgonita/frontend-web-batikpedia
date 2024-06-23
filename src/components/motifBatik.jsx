@@ -1,72 +1,65 @@
-import React, { useState } from 'react';
-import batik1 from '../assets/batik1.png';
-import batik2 from '../assets/batik2.png';
-import batik3 from '../assets/batik3.png';
-import batik4 from '../assets/batik4.png';
-import FilterIcon from './filterIcon';
-import Popup from './popup';
-
-const motifs = [
-  {
-    name: 'Batik Tujuh Rupa',
-    image: batik1,
-  },
-  {
-    name: 'Batik Mega Mendung',
-    image: batik2,
-  },
-  {
-    name: 'Batik Bojonegoro',
-    image: batik3,
-  },
-  {
-    name: 'Batik Banyumas',
-    image: batik4,
-  },
-];
+import React, { useState, useEffect } from 'react';
+import { fetchData } from '../api'; 
 
 const MotifBatik = () => {
-  const [isPopupOpen, setIsPopupOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [motifs, setMotifs] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  const togglePopup = () => {
-    setIsPopupOpen(!isPopupOpen);
+  useEffect(() => {
+    fetchData('http://localhost:5000/api/motifs')
+      .then(data => {
+        setMotifs(data);
+        setLoading(false);
+      })
+      .catch(error => {
+        console.error('Error fetching data:', error);
+        setError(error.message);
+        setLoading(false);
+      });
+  }, []);
+
+  const handleSearch = (e) => {
+    setSearchTerm(e.target.value);
   };
 
+  const filteredMotifs = motifs.filter((motif) =>
+    motif.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  if (loading) {
+    return <p>Loading...</p>;
+  }
+
+  if (error) {
+    return <p>Error: {error}</p>;
+  }
+
   return (
-    <div className="max-w-6xl mx-auto px-8 py-12">
-      <h1 className="text-5xl font-bold mb-10 ml-10">MOTIF BATIK</h1>
-      <div className="relative mb-10 flex items-center">
+    <div className="mt-0 px-4 py-20 bg-white shadow-md relative">
+      <h1 className="text-3xl md:text-4xl font-bold mb-10 text-center md:text-left">Motif Batik</h1>
+      <div className="relative mb-10 flex items-center justify-center md:justify-start">
         <input
           type="text"
-          className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600"
+          className="w-full max-w-lg px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600"
           placeholder="Cari ..."
+          value={searchTerm}
+          onChange={handleSearch}
         />
-        <button onClick={togglePopup} className="ml-4 p-2">
-          <FilterIcon />
-        </button>
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-10">
-        {motifs.map((motif, index) => (
-          <div key={index} className="bg-white rounded-lg shadow-md overflow-hidden">
-            <img src={motif.image} alt={motif.name} className="w-full h-72 object-cover" />
-            <div className="p-6">
-              <h2 className="text-lg font-semibold mb-4">{motif.name}</h2>
-              <button className="bg-[#314E52] text-white px-4 py-2 rounded-md hover:bg-opacity-90">
-                Selengkapnya
-              </button>
+      <div className="overflow-x-auto">
+        <div className="flex space-x-4">
+          {filteredMotifs.map((motif, index) => (
+            <div key={index} className="bg-white rounded-lg shadow-md overflow-hidden flex-shrink-0 w-72">
+              <img src={`http://localhost:5000${motif.image}`} alt={motif.name} className="w-full h-48 md:h-64 object-cover" />
+              <div className="p-6">
+                <h2 className="text-lg font-semibold mb-4">{motif.name}</h2>
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
-      <div className="flex justify-center mt-10">
-        <button className="px-4 py-2 mx-1 bg-gray-200 rounded-md hover:bg-gray-300">&lt;&lt;</button>
-        <button className="px-4 py-2 mx-1 bg-gray-200 rounded-md hover:bg-gray-300">1</button>
-        <button className="px-4 py-2 mx-1 bg-gray-200 rounded-md hover:bg-gray-300">2</button>
-        <button className="px-4 py-2 mx-1 bg-gray-200 rounded-md hover:bg-gray-300">3</button>
-        <button className="px-4 py-2 mx-1 bg-gray-200 rounded-md hover:bg-gray-300">4</button>
-        <button className="px-4 py-2 mx-1 bg-gray-200 rounded-md hover:bg-gray-300">&gt;&gt;</button>
-      </div>
-      {isPopupOpen && <Popup onClose={togglePopup} />}
     </div>
   );
 };

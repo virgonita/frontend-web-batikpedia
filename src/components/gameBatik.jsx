@@ -1,74 +1,84 @@
-import React, { useState } from 'react';
-import Game1 from '../assets/Game1.png';
-import BatikParang from '../assets/batik1.png'; 
-import BatikKawung from '../assets/batik2.png'; 
-import BatikMegaMendung from '../assets/batik3.png'; 
-
-const batikData = [
-  { name: 'Batik Parang', description: 'Motif parang adalah salah satu motif batik yang sangat terkenal.', image: BatikParang },
-  { name: 'Batik Kawung', description: 'Motif kawung memiliki bentuk geometris yang khas.', image: BatikKawung },
-  { name: 'Batik Mega Mendung', description: 'Motif mega mendung berasal dari Cirebon dengan bentuk awan yang khas.', image: BatikMegaMendung },
-];
+import React, { useState, useEffect } from "react";
+import Game1 from "../assets/Game1.png";
+import Salah from "../assets/salah.gif";
+import Benar from "../assets/benar.gif";
+import { fetchData } from "../api";
 
 const Game = () => {
   const [popupOpen, setPopupOpen] = useState(false);
   const [selectedBatik, setSelectedBatik] = useState(null);
-  const [answer, setAnswer] = useState('');
-  const [feedback, setFeedback] = useState('');
   const [showImage, setShowImage] = useState(false);
+  const [batikIndex, setBatikIndex] = useState(0);
+  const [shuffledBatikData, setShuffledBatikData] = useState([]);
+  const [correctModalOpen, setCorrectModalOpen] = useState(false);
+  const [incorrectModalOpen, setIncorrectModalOpen] = useState(false);
+  const [gameBatikData, setGameBatikData] = useState([]);
+
+  useEffect(() => {
+    const fetchDataFromAPI = async () => {
+      try {
+        const data = await fetchData("http://localhost:5000/api/gameBatik");
+        setGameBatikData(data);
+      } catch (error) {
+        console.error("Error fetching gameBatik data:", error);
+      }
+    };
+
+    fetchDataFromAPI();
+  }, []);
+
+  const shuffleArray = (array) => array.sort(() => Math.random() - 0.5);
 
   const openPopup = () => {
+    setShuffledBatikData(shuffleArray([...gameBatikData]));
+    setBatikIndex(0);
     setPopupOpen(true);
   };
 
   const closePopup = () => {
     setPopupOpen(false);
+    setSelectedBatik(null);
   };
 
-  const selectBatik = (batik) => {
-    setSelectedBatik(batik);
-    closePopup();
-  };
+  const handleSubmit = () => {
+    setPopupOpen(false);
+    if (!selectedBatik) return;
 
-  const checkAnswer = () => {
-    if (selectedBatik && answer.toLowerCase() === selectedBatik.name.toLowerCase()) {
-      setFeedback(`Selamat! Jawaban kamu benar. ${selectedBatik.description}`);
+    if (
+      selectedBatik.name.toLowerCase() ===
+      shuffledBatikData[batikIndex].name.toLowerCase()
+    ) {
       setShowImage(true);
+      setCorrectModalOpen(true);
     } else {
-      setFeedback(`Maaf, jawaban kamu salah. ${selectedBatik.description}`);
       setShowImage(false);
+      setIncorrectModalOpen(true);
     }
   };
 
-  const nextGame = () => {
-    setSelectedBatik(null);
-    setAnswer('');
-    setFeedback('');
-    setShowImage(false);
-    openPopup();
-  };
-
   return (
-    <section id="game" className="mt-32 p-5 bg-white shadow-lg relative">
+    <section id="game" className="px-4 py-20 bg-white shadow-md mt-16 relative">
       <div className="flex flex-col items-start">
-        <div className="mb-5">
-          <h1 className="text-2xl font-bold">Konten Membatik</h1>
+        <div className="header-konten mb-6">
+          <h1 className="text-3xl md:text-4xl font-bold mb-1 text-center md:text-left">Game Tebak Motif</h1>
         </div>
         <div className="flex justify-between w-full mt-5 bg-[#314E52] rounded-lg">
           <div className="p-5">
-            <img src={Game1} alt="Game Membatik" className="w-full max-w-full h-auto block rounded-lg" />
+            <img
+              src={Game1}
+              alt="Game Membatik"
+              className="w-full max-w-full h-auto block rounded-lg"
+            />
           </div>
           <div className="p-5 rounded-lg">
-            <h2 className="text-2xl text-white mt-20">Game edukasi tebak motif batik</h2>
-            <p className="text-white text-base leading-7 mt-3">
-              Ayo jelajahi warisan budaya Indonesia melalui game interaktif kami.
-              Klik gambar motif batik dan tunjukkan sejauh mana pengetahuanmu!
-              Saksikanlah keindahan tradisi yang tersembunyi di setiap pola,
-              dan jadilah bagian dari perjalanan ini untuk memperkaya pemahaman
-              akan kekayaan budaya kita.
+            <h2 className="text-4xl/7 text-white mt-12 font-poppins font-semibold">
+              Game edukasi tebak motif batik
+            </h2>
+            <p className="text-white text-lg leading-7 mt-3 font-poppins">
+              Ayo jelajahi warisan budaya Indonesia melalui game interaktif kami. Klik gambar motif batik dan tunjukkan sejauh mana pengetahuanmu! Saksikanlah keindahan tradisi yang tersembunyi di setiap pola, dan jadilah bagian dari perjalanan ini untuk memperkaya pemahaman akan kekayaan budaya kita.
             </p>
             <button
-              className="mt-5 px-5 py-2 bg-white text-[#314E52] rounded"
+              className="mt-5 px-5 py-2 bg-white text-[#314E52] rounded font-poppins"
               onClick={openPopup}
             >
               Mulai Bermain
@@ -77,57 +87,89 @@ const Game = () => {
         </div>
       </div>
 
-      {/* Popup */}
-      {popupOpen && (
-        <div className="fixed inset-0 flex items-center justify-center bg-gray-500 bg-opacity-50">
-          <div className="bg-white p-8 rounded-lg">
-            <h2 className="text-xl font-bold mb-4">Pilih Batik</h2>
-            <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {batikData.map((batik, index) => (
-                <li key={index} className="mb-2 cursor-pointer" onClick={() => selectBatik(batik)}>
-                  <img src={batik.image} alt={`Batik ${index + 1}`} className="w-full h-auto rounded-lg" />
-                </li>
-              ))}
-            </ul>
-            <button className="bg-red-500 text-white font-bold py-2 px-4 rounded mt-4" onClick={closePopup}>
-              Tutup
+      {popupOpen && shuffledBatikData.length > 0 && (
+        <div className="fixed inset-0 flex items-center justify-center bg-gray-500 bg-opacity-60">
+          <div className="bg-white p-4 mx-4 my-8 rounded-lg sm:p-8 sm:max-w-sm md:max-w-md lg:max-w-lg xl:max-w-xl relative">
+            <button onClick={closePopup} className="absolute top-0 right-0 bg-red-500 rounded-full -mt-2 -mr-2">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white p-1" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M10.707 10l5.147-5.146a.5.5 0 0 0-.708-.708L10 9.293 4.854 4.146a.5.5 0 0 0-.708.708L9.293 10l-5.147 5.146a.5.5 0 0 0 .708.708L10 10.707l5.146 5.147a.5.5 0 0 0 .708-.708L10.707 10z" clipRule="evenodd" />
+              </svg>
             </button>
+            <div className="flex items-center justify-center">
+              <img src={`http://localhost:5000${shuffledBatikData[batikIndex].image}`} alt="Batik" className="w-48 rounded-lg sm:w-56" />
+              <div className="bg-white ml-4 p-2 sm:p-5 rounded-md">
+                <p className="text-sm sm:text-base">Apakah nama motif batik dari potongan gambar disamping?</p>
+                <ul className="mt-2">
+                  {gameBatikData.map((batik, index) => (
+                    <li key={index}>
+                      <input
+                        type="radio"
+                        name="batik"
+                        value={batik.name}
+                        onChange={() => setSelectedBatik(batik)}
+                      />
+                      <label className="ml-2">{batik.name}</label>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+            <div className="flex items-center justify-center mt-4">
+              <button className="bg-[#314E52] w-24 sm:w-40 rounded-lg text-white py-2 px-4" onClick={handleSubmit}>
+                Kirim
+              </button>
+            </div>
           </div>
         </div>
       )}
 
-      {/* Jawaban */}
-      {selectedBatik && (
-        <div className="mt-4 flex items-center">
-          <input
-            type="text"
-            placeholder="Masukkan jawaban kamu..."
-            value={answer}
-            onChange={(e) => setAnswer(e.target.value)}
-            className="border p-2 rounded mr-2"
-          />
-          <button
-            className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
-            onClick={checkAnswer}
-          >
-            Periksa Jawaban
-          </button>
-          <button
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded ml-2"
-            onClick={nextGame}
-          >
-            Tebak Game Selanjutnya
-          </button>
+      {correctModalOpen && selectedBatik && (
+        <div className="fixed inset-0 flex items-center justify-center bg-gray-500 bg-opacity-60">
+          <div className="bg-white p-4 mx-4 my-8 rounded-lg sm:p-8 sm:max-w-sm md:max-w-md lg:max-w-lg xl:max-w-xl relative">
+            <button onClick={() => setCorrectModalOpen(false)} className="absolute top-0 right-0 bg-red-500 rounded-full -mt-2 -mr-2">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white p-1" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M10.707 10l5.147-5.146a.5.5 0 0 0-.708-.708L10 9.293 4.854 4.146a.5.5 0 0 0-.708.708L9.293 10l-5.147 5.146a.5.5 0 0 0 .708.708L10 10.707l5.146 5.147a.5.5 0 0 0 .708-.708L10.707 10z" clipRule="evenodd" />
+              </svg>
+            </button>
+            <div className="flex flex-col items-center">
+              <div className="flex items-center justify-center bg-[#314E52] text-white py-2 px-4 rounded-lg h-16 w-3/4 mb-4">
+                <img src={Benar} alt="Gif" className="h-full mr-4" />
+                <h2 className="text-white font-poppins text-xl font-bold text-center">Wow! Pengetahuanmu sungguh luar biasa</h2>
+              </div>
+              <div className="flex items-center mt-4 sm:mt-6">
+                <img src={`http://localhost:5000${shuffledBatikData[batikIndex].image}`} alt={shuffledBatikData[batikIndex].name} className="w-36 sm:w-56 rounded-lg" />
+                <div className="bg-white w-full sm:ml-4 mt-4 sm:mt-0 p-2 sm:p-5 rounded-md">
+                  <p className="text-sm sm:text-base text-black font-poppins text-xl font-semibold">Nah, ini detail lengkapnya ya!</p>
+                  <p className="mt-2 text-sm sm:text-base text-black font-poppins">{shuffledBatikData[batikIndex].description}</p>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       )}
 
-      {/* Feedback */}
-      {feedback && (
-        <div className="mt-4 flex items-center">
-          {showImage && selectedBatik && (
-            <img src={selectedBatik.image} alt={selectedBatik.name} className="w-16 h-16 rounded-lg mr-4" />
-          )}
-          <p>{feedback}</p>
+      {incorrectModalOpen && selectedBatik && (
+        <div className="fixed inset-0 flex items-center justify-center bg-gray-500 bg-opacity-60">
+          <div className="bg-white p-4 mx-4 my-8 rounded-lg sm:p-8 sm:max-w-sm md:max-w-md lg:max-w-lg xl:max-w-xl relative">
+            <button onClick={() => setIncorrectModalOpen(false)} className="absolute top-0 right-0 bg-red-500 rounded-full -mt-2 -mr-2">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white p-1" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M10.707 10l5.147-5.146a.5.5 0 0 0-.708-.708L10 9.293 4.854 4.146a.5.5 0 0 0-.708.708L9.293 10l-5.147 5.146a.5.5 0 0 0 .708.708L10 10.707l5.146 5.147a.5.5 0 0 0 .708-.708L10.707 10z" clipRule="evenodd" />
+              </svg>
+            </button>
+            <div className="flex flex-col items-center">
+              <div className="flex items-center justify-center bg-[#314E52] text-white py-2 px-4 rounded-lg h-16 w-3/4 mb-4">
+                <img src={Salah} alt="Gif" className="h-full mr-4" />
+                <h2 className="text-white font-poppins text-xl font-bold text-center">Yah, jawabannya masih kurang tepat nihhh!</h2>
+              </div>
+              <div className="flex items-center mt-4 sm:mt-6">
+                <img src={`http://localhost:5000${shuffledBatikData[batikIndex].image}`} alt={shuffledBatikData[batikIndex].name} className="w-36 sm:w-56 rounded-lg" />
+                <div className="bg-white w-full sm:ml-4 mt-4 sm:mt-0 p-2 sm:p-5 rounded-md">
+                  <p className="text-sm sm:text-base text-black font-poppins text-xl font-semibold">Nah, ini jawaban yang benar!</p>
+                  <p className="mt-2 text-sm sm:text-base text-black font-poppins">{shuffledBatikData[batikIndex].description}</p>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       )}
     </section>

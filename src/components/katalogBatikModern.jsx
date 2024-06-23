@@ -1,75 +1,24 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import batikLanding from '../assets/batikmodern.png';
-import batikSmall1 from '../assets/batikmodernsmall1.png';
-import batikSmall2 from '../assets/batikmodernsmall2.png';
-import batikSmall3 from '../assets/batikmodernsmall3.png';
-import batikSmall4 from '../assets/batikmodernsmall4.png';
-import batikSmall5 from '../assets/batikmodernsmall5.png';
-import batikSmall6 from '../assets/batikmodernsmall6.png';
-import batikSmall7 from '../assets/batikmodernsmall7.png';
-import batikSmall8 from '../assets/batikmodernsmall8.png';
-import batik1 from '../assets/batikmodern1.png';
-import batik2 from '../assets/batikmodern2.png';
-import batik3 from '../assets/batikmodern3.png';
-import batik4 from '../assets/batikmodern4.png';
-import batik5 from '../assets/batikmodern5.png';
-import batik6 from '../assets/batikmodern6.png';
-import batik7 from '../assets/batikmodern7.png';
-import batik8 from '../assets/batikmodern8.png';
+import { fetchData } from '../api';
 
-const motifs = [
-  {
-    name: 'Batik Bojonegoro',
-    image: batik1,
-    smallImage: batikSmall1,
-    description: 'Teknik Pembuatan: Batik Cap(Stempel)\nAsal: Jawa Timur',
-  },
-  {
-    name: 'Batik Banyumas',
-    image: batik2,
-    smallImage: batikSmall2,
-    description: 'Teknik Pembuatan: Batik Lukis\nAsal: Jawa Tengah',
-  },
-  {
-    name: 'Batik Fractal',
-    image: batik3,
-    smallImage: batikSmall3,
-    description: 'Teknik Pembuatan: Batik Print\nAsal: Jawa Barat',
-  },
-  {
-    name: 'Batik Bebetakan Jogja',
-    image: batik4,
-    smallImage: batikSmall4,
-    description: 'Teknik Pembuatan: Batik Lukis\nAsal: Jawa Tengah',
-  },
-  {
-    name: 'Batik Rencur',
-    image: batik5,
-    smallImage: batikSmall5,
-    description: 'Teknik Pembuatan: Batik Cap(Stempel)\nAsal: Jawa Barat',
-  },
-  {
-    name: 'Batik Lingga',
-    image: batik6,
-    smallImage: batikSmall6,
-    description: 'Teknik Pembuatan: Batik Print\nAsal: Jawa Barat',
-  },
-  {
-    name: 'Batik Lainnya',
-    image: batik7,
-    smallImage: batikSmall7,
-    description: 'Teknik Pembuatan: Batik Cap(Stempel)\nAsal: Jawa Timur',
-  },
-  {
-    name: 'Batik Terakhir',
-    image: batik8,
-    smallImage: batikSmall8,
-    description: 'Teknik Pembuatan: Batik Cap(Stempel)\nAsal: Jawa Timur',
-  },
-];
-
-const KatalogBatikModern = () => {
+const KatalogBatikTradisional = () => {
+  const [motifs, setMotifs] = useState([]);
   const [selectedMotif, setSelectedMotif] = useState(null);
+
+  useEffect(() => {
+    fetchMotifs();
+  }, []);
+
+  const fetchMotifs = async () => {
+    try {
+      const data = await fetchData('http://localhost:5000/api/batikModern');
+      console.log('Fetched motifs:', data);
+      setMotifs(data);
+    } catch (error) {
+      console.error('Error fetching motifs:', error);
+    }
+  };
 
   const handleDetailClick = (motif) => {
     setSelectedMotif(motif);
@@ -81,7 +30,6 @@ const KatalogBatikModern = () => {
 
   return (
     <>
-      {/* Landing Page */}
       <section id="landing" className="flex justify-center items-center h-screen bg-gray-200">
         <div className="landing-container">
           <div className="flex justify-center items-center">
@@ -89,20 +37,18 @@ const KatalogBatikModern = () => {
           </div>
         </div>
       </section>
-      {/* End of Landing Page */}
 
-      {/* Batik Modern */}
-      <section id="batik-modern" className="py-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+      <section id="batik-tradisional" className="py-12">
+        <div className="container mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
           {motifs.map((motif, index) => (
             <div key={index} className="flex flex-col md:flex-row items-center bg-white p-6 rounded-lg shadow-lg">
               <div className="relative w-64 h-64">
-                <img src={motif.image} alt={`katalog${index + 1}`} className="w-full h-full object-cover rounded-lg" />
-                <img src={motif.smallImage} alt={`small-image${index + 1}`} className="absolute top-1/2 left-1/2 w-28 h-28 object-cover rounded-lg border-4 border-white shadow-lg transform -translate-x-1/2 -translate-y-1/2" />
+                <img src={`http://localhost:5000/images/${motif.image}`} alt={`katalog${index + 1}`} className="w-full h-full object-cover rounded-lg" />
+                <img src={`http://localhost:5000/images/${motif.smallImage}`} alt={`small-image${index + 1}`} className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-28 h-28 object-cover rounded-lg border-4 border-white shadow-lg" />
               </div>
               <div className="detail-card mt-4 md:mt-0 md:ml-4 text-center">
-                <h2 className="text-2xl font-bold">{motif.name}</h2>
-                <p className="mt-2 whitespace-pre-line">{motif.description}</p>
+                <h2 className="text-lg md:text-2xl font-bold">{motif.name}</h2>
+                <p className="mt-2 text-sm md:text-base whitespace-pre-line">{motif.description}</p>
                 <button
                   onClick={() => handleDetailClick(motif)}
                   className="mt-4 bg-[#314E52] text-white px-4 py-2 rounded hover:bg-[#273f43]"
@@ -114,20 +60,18 @@ const KatalogBatikModern = () => {
           ))}
         </div>
       </section>
-      {/* End of Batik Modern */}
 
       {selectedMotif && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-4 max-w-md w-full relative">
-            <button
-              onClick={handleClosePopup}
-              className="absolute top-2 right-2 text-red-500"
-            >
-              X
+            <button onClick={handleClosePopup} className="absolute top-0 right-0 bg-red-500 rounded-full -mt-2 -mr-2">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white p-1" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M10.707 10l5.147-5.146a.5.5 0 0 0-.708-.708L10 9.293 4.854 4.146a.5.5 0 0 0-.708.708L9.293 10l-5.147 5.146a.5.5 0 0 0 .708.708L10 10.707l5.146 5.147a.5.5 0 0 0 .708-.708L10.707 10z" clipRule="evenodd" />
+              </svg>
             </button>
-            <img src={selectedMotif.smallImage} alt={selectedMotif.name} className="w-full h-56 object-cover mb-4" />
-            <h2 className="text-2xl font-bold mb-2">{selectedMotif.name}</h2>
-            <p className="whitespace-pre-line">{selectedMotif.description}</p>
+            <img src={`http://localhost:5000/images/${selectedMotif.smallImage}`} alt={selectedMotif.name} className="w-full h-56 object-cover mb-4" />
+            <h2 className="text-lg md:text-2xl font-bold mb-2">{selectedMotif.name}</h2>
+            <p className="text-sm md:text-base whitespace-pre-line">{selectedMotif.description}</p>
           </div>
         </div>
       )}
@@ -135,4 +79,4 @@ const KatalogBatikModern = () => {
   );
 };
 
-export default KatalogBatikModern;
+export default KatalogBatikTradisional;

@@ -1,53 +1,39 @@
-import React from 'react';
-import berita1 from '../assets/berita1.png';
-import berita2 from '../assets/berita2.png';
-import berita3 from '../assets/berita3.png';
+import React, { useEffect, useState } from 'react';
+import { fetchData } from '../api';
 
 function BeritaSection() {
+  const [berita, setBerita] = useState([]);
+
+  useEffect(() => {
+    fetchData('http://localhost:5000/api/berita')
+      .then(data => {
+        setBerita(data);
+      })
+      .catch(error => {
+        console.error('Error:', error);
+      });
+  }, []);
+
   return (
-    <section id="berita" className="mt-32 px-10 bg-white shadow-md">
-      <h1 className="berita-title text-5xl font-bold mb-10 ml-10">Berita Terkini</h1>
-      <div className="flex justify-center gap-20">
-        <div className="berita-left flex-1 max-w-500">
-        <div className="image-berita-left text-center mb-3 p-0 bg-[#314E52] rounded-lg shadow-md">
-          <img src={berita1} alt="berita1" className="w-full h-auto rounded-lg" />
-          <div className="description-berita-left p-3">
-            <h3 className="text-white text-lg font-semibold mb-2">
-              Tony Midiyanto sosok dibalik desain Batik Banyuwangi di jaket Valentino Rossi
-            </h3>
-            <div className="date flex justify-between items-center text-white">
-              <span><i className="fas fa-calendar-alt mr-1"></i> Jumat, 02 Feb 2024 19:17 WIB</span>
-              <span><i className="fas fa-arrow-right"></i></span>
-            </div>
-          </div>
-        </div>
-        </div>
-        <div className="berita-right flex-1">
-          <div className="berita-card mb-10">
-            <div className="image-berita-right text-center p-0 bg-[#314E52] rounded-lg shadow-md">
-              <img src={berita2} alt="berita2" className="w-full rounded-lg" />
-              <div className="description-berita-right p-5">
-                <h3 className="text-white text-lg font-semibold mb-3">Pernah Lihat Kopi dan Teh Jadi Pewarna Batik?</h3>
+    <section id="berita" className="mt-10 px-4 sm:px-10 bg-white shadow-md">
+      <h1 className="text-3xl md:text-4xl font-bold mb-10 text-center md:text-left">Berita Terkini</h1>
+      <div className="flex flex-wrap justify-center gap-8">
+        {berita.map(item => (
+          <div key={item.id} className="berita-card flex-1 max-w-300">
+            <div className="image-berita text-center mb-3 p-0 bg-[#314E52] rounded-lg shadow-md">
+              <img src={`http://localhost:5000/images/${item.image}`} alt={item.title} className="w-full h-auto rounded-lg" style={{ maxHeight: '300px' }} />
+              <div className="description-berita p-3">
+                <h3 className="text-white text-lg font-semibold mb-2">{item.title}</h3>
                 <div className="date flex justify-between items-center text-white">
-                  <span><i className="fas fa-calendar-alt mr-1"></i> Selasa, 30 Apr 2024 23:00 WIB</span>
-                  <span><i className="fas fa-arrow-right"></i></span>
+                  <span><i className="fas fa-calendar-alt mr-1"></i> {item.date}</span>
+                  <a href={item.url} target="_blank" rel="noopener noreferrer">
+                    <span><i className="fas fa-arrow-right"></i></span>
+                  </a>
                 </div>
               </div>
             </div>
           </div>
-          <div className="berita-card">
-            <div className="image-berita-right text-center p-0 bg-[#314E52] rounded-lg shadow-md">
-              <img src={berita3} alt="berita3" className="w-full rounded-lg" />
-              <div className="description-berita-right p-5">
-                <h3 className="text-white text-lg font-semibold mb-3">Pemkab Serang Ajak Puluhan Warga Latihan Membatik di Bandung</h3>
-                <div className="date flex justify-between items-center text-white">
-                  <span><i className="fas fa-calendar-alt mr-1"></i> Selasa, 30 Apr 2024 15:50 WIB</span>
-                  <span><i className="fas fa-arrow-right"></i></span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+        ))}
       </div>
     </section>
   );
