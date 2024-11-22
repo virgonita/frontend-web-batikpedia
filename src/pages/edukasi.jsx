@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import Header from '../components/header';
 import EdukasiBatik from '../components/edukasiBatik';
 import KelasEdukasi from '../components/kelasEdukasi';

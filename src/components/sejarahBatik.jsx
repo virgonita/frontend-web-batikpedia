@@ -1,21 +1,22 @@
 import React, { useEffect, useState } from 'react';
-import { fetchData } from '../api';
 import Sejarah from '../assets/sejarah.png';
+import AxiosInterceptor from "../utils/AxiosInterceptor";
 
 function SejarahBatik() {
   const [sejarah, setSejarah] = useState([]);
   const [landingData, setLandingData] = useState(null);
-
+  const getData=async ()=>{
+    try {
+      const data = await AxiosInterceptor("/sejarah")
+      setSejarah(data.filter(item => item.title !== 'SEJARAH BATIK'));
+      const landing = data.find(item => item.title === 'SEJARAH BATIK');
+      setLandingData(landing);
+    }catch (e){
+      console.log('Error: ',e)
+    }
+  }
   useEffect(() => {
-    fetchData('http://localhost:5000/api/sejarah')
-      .then(data => {
-        setSejarah(data.filter(item => item.title !== 'SEJARAH BATIK')); 
-        const landing = data.find(item => item.title === 'SEJARAH BATIK');
-        setLandingData(landing);
-      })
-      .catch(error => {
-        console.error('Error:', error);
-      });
+    getData()
   }, []);
 
   if (!landingData) return null;
@@ -38,7 +39,7 @@ function SejarahBatik() {
         <section key={item.id} className="bg-white py-12 shadow-md">
           <div className="container mx-auto flex flex-col md:flex-row items-center justify-center gap-8">
             <div className="w-full md:w-1/3">
-              <img src={`http://localhost:5000/images/${item.image}`} alt={item.title} className="w-full rounded-lg shadow-md" />
+              <img src={`${process.env.REACT_APP_APIURL}/images/${item.image}`} alt={item.title} className="w-full rounded-lg shadow-md" />
             </div>
             <div className="w-full md:w-2/3">
               <h2 className="text-2xl md:text-3xl font-bold mb-4">{item.title}</h2>
