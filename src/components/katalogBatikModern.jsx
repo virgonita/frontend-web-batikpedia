@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import batikLanding from '../assets/batikmodern.png';
-import { fetchData } from '../api';
+import AxiosInterceptor from "../utils/AxiosInterceptor";
 
 const KatalogBatikTradisional = () => {
   const [motifs, setMotifs] = useState([]);
@@ -12,7 +12,7 @@ const KatalogBatikTradisional = () => {
 
   const fetchMotifs = async () => {
     try {
-      const data = await fetchData('http://localhost:5000/api/batikModern');
+      const data = await AxiosInterceptor('/batikModern');
       console.log('Fetched motifs:', data);
       setMotifs(data);
     } catch (error) {
@@ -43,8 +43,8 @@ const KatalogBatikTradisional = () => {
           {motifs.map((motif, index) => (
             <div key={index} className="flex flex-col md:flex-row items-center bg-white p-6 rounded-lg shadow-lg">
               <div className="relative w-64 h-64">
-                <img src={`http://localhost:5000/images/${motif.image}`} alt={`katalog${index + 1}`} className="w-full h-full object-cover rounded-lg" />
-                <img src={`http://localhost:5000/images/${motif.smallImage}`} alt={`small-image${index + 1}`} className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-28 h-28 object-cover rounded-lg border-4 border-white shadow-lg" />
+                <img src={`${process.env.REACT_APP_APIURL}/images/${motif.image}`} alt={`katalog${index + 1}`} className="w-full h-full object-cover rounded-lg" />
+                <img src={`${process.env.REACT_APP_APIURL}/images/${motif.smallImage}`} alt={`small-image${index + 1}`} className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-28 h-28 object-cover rounded-lg border-4 border-white shadow-lg" />
               </div>
               <div className="detail-card mt-4 md:mt-0 md:ml-4 text-center">
                 <h2 className="text-lg md:text-2xl font-bold">{motif.name}</h2>
@@ -69,7 +69,7 @@ const KatalogBatikTradisional = () => {
                 <path fillRule="evenodd" d="M10.707 10l5.147-5.146a.5.5 0 0 0-.708-.708L10 9.293 4.854 4.146a.5.5 0 0 0-.708.708L9.293 10l-5.147 5.146a.5.5 0 0 0 .708.708L10 10.707l5.146 5.147a.5.5 0 0 0 .708-.708L10.707 10z" clipRule="evenodd" />
               </svg>
             </button>
-            <img src={`http://localhost:5000/images/${selectedMotif.smallImage}`} alt={selectedMotif.name} className="w-full h-56 object-cover mb-4" />
+            <img src={`${process.env.REACT_APP_APIURL}/images/${selectedMotif.smallImage}`} alt={selectedMotif.name} className="w-full h-56 object-cover mb-4" />
             <h2 className="text-lg md:text-2xl font-bold mb-2">{selectedMotif.name}</h2>
             <p className="text-sm md:text-base whitespace-pre-line">{selectedMotif.description}</p>
           </div>

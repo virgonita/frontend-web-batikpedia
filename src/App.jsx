@@ -1,6 +1,5 @@
 import React from "react";
-import { useEffect, useState } from 'react';
-import { fetchData } from './api';
+import { useEffect} from 'react';
 import { BrowserRouter, Routes, Route  } from 'react-router-dom';
 import Beranda from './pages/beranda';
 import SejarahBatik from './pages/sejarahBatik';
@@ -37,24 +36,8 @@ const App = () => {
   }, []);
 
 
-  const [data, setData] = useState(null);
-
-  useEffect(() => {
-    fetchData()
-      .then(data => {
-        setData(data);
-      })
-      .catch(error => {
-        console.error('Error:', error);
-      });
-  }, []);
-
   return (
     <>
-      <div>
-        <h1>Data from API</h1>
-        {data ? <pre>{JSON.stringify(data, null, 2)}</pre> : <p>Loading...</p>}
-      </div>
 
       <BrowserRouter>
         <Routes>

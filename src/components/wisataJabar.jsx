@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { fetchData } from '../api'; 
 import Carousel from "react-multi-carousel";
 import "react-multi-carousel/lib/styles.css";
+import AxiosInterceptor from "../utils/AxiosInterceptor";
 
 const WisataJabar = () => {
   const [images, setImages] = useState([]);
@@ -12,8 +12,8 @@ const WisataJabar = () => {
   useEffect(() => {
     const getData = async () => {
       try {
-        const data = await fetchData('http://localhost:5000/api/wisataJabar');
-        setImages(data.images.map(image => `http://localhost:5000${image}`));
+        const data = await AxiosInterceptor('/wisataJabar');
+        setImages(data.images.map(image => `${process.env.REACT_APP_APIURL}${image}`));
         setDescription(data.description);
         setTitle(data.title);
       } catch (error) {

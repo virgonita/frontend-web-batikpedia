@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { fetchData } from '../api'; 
+import axiosInterceptor from "../utils/AxiosInterceptor";
 
 function KelasEdukasi() {
   const [popupInfo, setPopupInfo] = useState(null);
@@ -8,7 +8,8 @@ function KelasEdukasi() {
   useEffect(() => {
     const fetchClasses = async () => {
       try {
-        const data = await fetchData('http://localhost:5000/api/kelasEdukasi');
+        const data = await axiosInterceptor.get('/kelasEdukasi');
+        console.log(data)
         setClasses(data);
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -36,7 +37,7 @@ function KelasEdukasi() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
             {classes.map((classInfo, index) => (
               <div key={index} className="image relative">
-                <img src={`http://localhost:5000${classInfo.imageSrc}`} alt={`Kelas ${index + 1}`} className="gallery-image w-full h-auto rounded-lg" />
+                <img src={`${process.env.REACT_APP_APIURL}${classInfo.imageSrc}`} alt={`Kelas ${index + 1}`} className="gallery-image w-full h-auto rounded-lg" />
                 <div className="description absolute bottom-0 left-0 right-0 bg-white bg-opacity-90 p-4">
                   <h3 className="text-lg font-semibold mb-1">{classInfo.title}</h3>
                   <p className="text-sm mb-2">{classInfo.location}</p>
@@ -56,7 +57,7 @@ function KelasEdukasi() {
                 <path fillRule="evenodd" d="M10.707 10l5.147-5.146a.5.5 0 0 0-.708-.708L10 9.293 4.854 4.146a.5.5 0 0 0-.708.708L9.293 10l-5.147 5.146a.5.5 0 0 0 .708.708L10 10.707l5.146 5.147a.5.5 0 0 0 .708-.708L10.707 10z" clipRule="evenodd" />
               </svg>
             </button>
-            <img src={`http://localhost:5000${popupInfo.imageSrc}`} alt="Class Image" className="w-full h-56 object-cover mb-4 rounded-lg" />
+            <img src={`${process.env.REACT_APP_APIURL}${popupInfo.imageSrc}`} alt="Class Image" className="w-full h-56 object-cover mb-4 rounded-lg" />
             <h2 className="text-2xl font-bold mb-2">{popupInfo.title}</h2>
             <p className="whitespace-pre-line">{popupInfo.description}</p>
             <p className="mt-2"><strong>Lokasi:</strong> {popupInfo.location}</p>

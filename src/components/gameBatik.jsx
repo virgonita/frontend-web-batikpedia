@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import Game1 from "../assets/Game1.png";
 import Salah from "../assets/salah.gif";
 import Benar from "../assets/benar.gif";
-import { fetchData } from "../api";
+import AxiosInterceptor from "../utils/AxiosInterceptor";
 
 const Game = () => {
   const [popupOpen, setPopupOpen] = useState(false);
@@ -17,7 +17,7 @@ const Game = () => {
   useEffect(() => {
     const fetchDataFromAPI = async () => {
       try {
-        const data = await fetchData("http://localhost:5000/api/gameBatik");
+        const data = await AxiosInterceptor("/gameBatik");
         setGameBatikData(data);
       } catch (error) {
         console.error("Error fetching gameBatik data:", error);
@@ -96,7 +96,7 @@ const Game = () => {
               </svg>
             </button>
             <div className="flex items-center justify-center">
-              <img src={`http://localhost:5000${shuffledBatikData[batikIndex].image}`} alt="Batik" className="w-48 rounded-lg sm:w-56" />
+              <img src={`${process.env.REACT_APP_APIURL}${shuffledBatikData[batikIndex].image}`} alt="Batik" className="w-48 rounded-lg sm:w-56" />
               <div className="bg-white ml-4 p-2 sm:p-5 rounded-md">
                 <p className="text-sm sm:text-base">Apakah nama motif batik dari potongan gambar disamping?</p>
                 <ul className="mt-2">
@@ -137,7 +137,7 @@ const Game = () => {
                 <h2 className="text-white font-poppins text-xl font-bold text-center">Wow! Pengetahuanmu sungguh luar biasa</h2>
               </div>
               <div className="flex items-center mt-4 sm:mt-6">
-                <img src={`http://localhost:5000${shuffledBatikData[batikIndex].image}`} alt={shuffledBatikData[batikIndex].name} className="w-36 sm:w-56 rounded-lg" />
+                <img src={`${process.env.REACT_APP_APIURL}${shuffledBatikData[batikIndex].image}`} alt={shuffledBatikData[batikIndex].name} className="w-36 sm:w-56 rounded-lg" />
                 <div className="bg-white w-full sm:ml-4 mt-4 sm:mt-0 p-2 sm:p-5 rounded-md">
                   <p className="text-sm sm:text-base text-black font-poppins text-xl font-semibold">Nah, ini detail lengkapnya ya!</p>
                   <p className="mt-2 text-sm sm:text-base text-black font-poppins">{shuffledBatikData[batikIndex].description}</p>
@@ -162,7 +162,7 @@ const Game = () => {
                 <h2 className="text-white font-poppins text-xl font-bold text-center">Yah, jawabannya masih kurang tepat nihhh!</h2>
               </div>
               <div className="flex items-center mt-4 sm:mt-6">
-                <img src={`http://localhost:5000${shuffledBatikData[batikIndex].image}`} alt={shuffledBatikData[batikIndex].name} className="w-36 sm:w-56 rounded-lg" />
+                <img src={`${process.env.REACT_APP_APIURL}${shuffledBatikData[batikIndex].image}`} alt={shuffledBatikData[batikIndex].name} className="w-36 sm:w-56 rounded-lg" />
                 <div className="bg-white w-full sm:ml-4 mt-4 sm:mt-0 p-2 sm:p-5 rounded-md">
                   <p className="text-sm sm:text-base text-black font-poppins text-xl font-semibold">Nah, ini jawaban yang benar!</p>
                   <p className="mt-2 text-sm sm:text-base text-black font-poppins">{shuffledBatikData[batikIndex].description}</p>

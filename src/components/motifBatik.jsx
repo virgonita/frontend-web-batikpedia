@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { fetchData } from '../api'; 
+import AxiosInterceptor from "../utils/AxiosInterceptor";
 
 const MotifBatik = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -7,17 +7,20 @@ const MotifBatik = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  const getData=async ()=>{
+    try {
+      const data = await AxiosInterceptor("/motifs")
+      setMotifs(data)
+      setLoading(false)
+    }catch (e){
+      console.log('Error: ',e)
+      setLoading(false)
+      setError(e.message)
+    }
+  }
+
   useEffect(() => {
-    fetchData('http://localhost:5000/api/motifs')
-      .then(data => {
-        setMotifs(data);
-        setLoading(false);
-      })
-      .catch(error => {
-        console.error('Error fetching data:', error);
-        setError(error.message);
-        setLoading(false);
-      });
+    getData()
   }, []);
 
   const handleSearch = (e) => {
@@ -52,7 +55,7 @@ const MotifBatik = () => {
         <div className="flex space-x-4">
           {filteredMotifs.map((motif, index) => (
             <div key={index} className="bg-white rounded-lg shadow-md overflow-hidden flex-shrink-0 w-72">
-              <img src={`http://localhost:5000${motif.image}`} alt={motif.name} className="w-full h-48 md:h-64 object-cover" />
+              <img src={`${process.env.REACT_APP_APIURL}${motif.image}`} alt={motif.name} className="w-full h-48 md:h-64 object-cover" />
               <div className="p-6">
                 <h2 className="text-lg font-semibold mb-4">{motif.name}</h2>
               </div>

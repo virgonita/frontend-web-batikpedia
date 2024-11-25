@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { fetchData } from '../api'; 
+import AxiosInterceptor from "../utils/AxiosInterceptor";
 
 function KontenMembatik() {
   const [kontenMembatik, setKontenMembatik] = useState([]);
@@ -7,7 +7,7 @@ function KontenMembatik() {
   useEffect(() => {
     const fetchKontenMembatik = async () => {
       try {
-        const data = await fetchData('http://localhost:5000/api/kontenmembatik'); 
+        const data = await AxiosInterceptor('/kontenmembatik');
         setKontenMembatik(data);
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -32,7 +32,7 @@ function KontenMembatik() {
               </div>
               <div className="image-container mt-4">
                 <img 
-                  src={`http://localhost:5000${konten.src}`} 
+                  src={`${process.env.REACT_APP_APIURL}${konten.src}`}
                   alt={konten.title} 
                   className="w-full rounded-lg" 
                 />
